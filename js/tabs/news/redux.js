@@ -2,6 +2,7 @@
 'use strict';
 
 import fetchNewsData from './helpers';
+import { feeds } from '../../util/Constants';
 
 // ACTIONS
 // action that is dispatched whenever the news will we fetched
@@ -38,9 +39,13 @@ export function fetchNews() { // a function as actions (enabled by thunk)
   return async function (dispatch) {
     dispatch(requestNews());
     try {
-      const response = await fetch('https://www.dhbw-loerrach.de/index.php?id=3965&type=105');
-      const responseBody = await response.text();
-      const newsItems = fetchNewsData(responseBody);
+      let response, responseBody;
+      let newsItems = {};
+      await Promise.all(feeds.map(async (feed) => {
+          response = await fetch('https://www.dhbw-loerrach.de/index.php?id=' + feed.id + '&type=' + feed.type);
+          responseBody = await response.text();
+          newsItems[feed.key] = fetchNewsData(responseBody);
+      }));
       dispatch(receiveNews(newsItems));
     } catch(e) {
       dispatch(errorFetchingNews());

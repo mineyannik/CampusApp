@@ -21,6 +21,8 @@ import { fetchNews } from './redux';
 import NewsItem from '../../util/types.js';
 import CampusHeader from '../../util/CampusHeader';
 import ReloadView from '../../util/ReloadView';
+import TabbedSwipeView from '../../util/TabbedSwipeView';
+import { feeds } from '../../util/Constants';
 
 function selectPropsFromStore(store) {
   return {
@@ -61,6 +63,19 @@ class NewsScreen extends Component {
     return false;
   }
 
+  _getPages(news) {
+      return (
+          feeds.map(
+              (feed) => {
+                  return {
+                      title: feed.name,
+                      content: <ScrollView bounces={false}>{this._renderNewsItems(news[feed.key])}</ScrollView>,
+                  };
+              }
+          )
+      );
+  }
+
   _renderNewsItems(news) {
     return (
       news.map(
@@ -91,7 +106,7 @@ class NewsScreen extends Component {
     }
 
     return (
-      <ScrollView bounces={false}>{this._renderNewsItems(news)}</ScrollView>
+        <TabbedSwipeView pages={this._getPages(news)}/>
     );
   }
 
@@ -106,7 +121,7 @@ class NewsScreen extends Component {
 
     return (
       <View style={styles.container}>
-        <CampusHeader title="News"/>
+        <CampusHeader title="News" style={styles.header}/>
         {this._renderScreenContent()}
       </View>
     );
@@ -114,15 +129,18 @@ class NewsScreen extends Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  center: {
-    flex: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  }
+    container: {
+        flex: 1,
+        backgroundColor: 'white',
+    },
+    center: {
+        flex: 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    header: {
+        elevation: 0
+    },
 });
 
 export default connect(selectPropsFromStore)(NewsScreen);
