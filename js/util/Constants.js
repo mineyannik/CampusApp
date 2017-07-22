@@ -10,7 +10,7 @@ module.exports = {
   feeds: [
       {name: 'News', key: 'news', id: 3965, type: 105},
       {name: 'Termine', key: 'events', id: 59, type: 100},
-      {name: 'Partys', key: 'news', id: 3965, type: 105},
+      {name: 'StuV', key: 'stuvdhbwloerrach', id: 3965, type: 999}, // 999 = Facebook feed
       {name: 'Notfälle', key: 'news', id: 3965, type: 105}
   ],
 };

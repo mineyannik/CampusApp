@@ -49,3 +49,25 @@ export default function fetchNewsData(newsXMLData) {
 
   return newsList;
 }
+
+export function fetchNewsDataFromFb(fbJsonNewsData) {
+  let newsList = [];
+  fbJsonNewsData.data.map((newsElem, index) => {
+    newsList.push({
+      id: index,
+      url: newsElem.permalink_url,
+      heading: newsElem.caption || newsElem.name,
+      subheading: newsElem.story || '',
+      time: _parseFbDate(newsElem.created_time),
+      imgUrl: newsElem.full_picture,
+      body: newsElem.description || newsElem.message
+    });
+  });
+  return newsList;
+}
+
+function _parseFbDate(fbDate) {
+  let dateString = fbDate.slice(0, fbDate.length - 2) + ':' + fbDate.slice(fbDate.length - 2) ;
+  console.log(dateString);
+  return new Date(dateString);
+}
