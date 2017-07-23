@@ -17,7 +17,7 @@ import { connect } from 'react-redux';
 import NewsCell from './NewsCell';
 import NewsDetails from './NewsDetails';
 import { fetchNews } from './redux';
-
+import NewsSettings from './NewsSettings';
 import NewsItem from '../../util/types.js';
 import CampusHeader from '../../util/CampusHeader';
 import ReloadView from '../../util/ReloadView';
@@ -64,16 +64,19 @@ class NewsScreen extends Component {
   }
 
   _getPages(news) {
-      return (
-          feeds.map(
+      let pages = feeds.map(
               (feed) => {
                   return {
                       title: feed.name,
                       content: <ScrollView bounces={false}>{this._renderNewsItems(news[feed.key])}</ScrollView>,
                   };
               }
-          )
-      );
+          );
+      pages.push({
+        title: 'Einstellungen',
+        content: <ScrollView bounces={false} feeds={feeds}><NewsSettings></NewsSettings></ScrollView>
+      })
+      return pages;
   }
 
   _renderNewsItems(news) {

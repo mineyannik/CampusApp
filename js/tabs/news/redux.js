@@ -38,22 +38,24 @@ export function errorFetchingNews() {
 }
 
 export function fetchNews() { // a function as actions (enabled by thunk)
-  return async function (dispatch) {
+  return async function (dispatch, getState) {
     dispatch(requestNews());
     try {
       let response, responseBody;
       let newsItems = {};
+      const { subscribedFeeds } = getState().news;
       await Promise.all(feeds.map(async (feed) => {
-        if(feed.type == 999) { // 999 = Facebook News Feed
-          response = await fetch('https://graph.facebook.com/' + feed.key + '/posts?fields=message,full_picture,caption,description,name,story,created_time,permalink_url&limit=10&access_token=' + fbAccessToken);
-          responseBody = await response.json();
-          newsItems[feed.key] = fetchNewsDataFromFb(responseBody);
-        } else {
-          response = await fetch('https://www.dhbw-loerrach.de/index.php?id=' + feed.id + '&type=' + feed.type);
-          responseBody = await response.text();
-          newsItems[feed.key] = fetchNewsData(responseBody);
-        }  
-        
+        if(subscribedFeeds.includes(feed.subId)) {
+          if(feed.type == 999) { // 999 = Facebook News Feed
+            response = await fetch('https://graph.facebook.com/' + feed.key + '/posts?fields=message,full_picture,caption,description,name,story,created_time,permalink_url&limit=10&access_token=' + fbAccessToken);
+            responseBody = await response.json();
+            newsItems[feed.key] = fetchNewsDataFromFb(responseBody);
+          } else {
+            response = await fetch('https://www.dhbw-loerrach.de/index.php?id=' + feed.id + '&type=' + feed.type);
+            responseBody = await response.text();
+            newsItems[feed.key] = fetchNewsData(responseBody);
+          } 
+        }
       }));
       dispatch(receiveNews(newsItems));
     } catch(e) {
@@ -62,11 +64,21 @@ export function fetchNews() { // a function as actions (enabled by thunk)
   }
 }
 
+const SUBSCRIPTIONS_CHANGED = 'SUBSCRIPTIONS_CHANGED';
+
+export function subscriptionsChanged(newsubs) {
+  return {
+    type: SUBSCRIPTIONS_CHANGED,
+    subs: newsubs
+  }
+}
+
 // REDUCER
 export function news(state = {
   isFetching: false,
   networkError: false,
   lastUpdated: null,
+  subscribedFeeds: [1,2,3,4],
   news: []
 }, action) {
   switch (action.type) {
@@ -86,6 +98,10 @@ export function news(state = {
       return {...state,
         isFetching: false,
         networkError: true,
+      };
+    case SUBSCRIPTIONS_CHANGED:
+      return {...state,
+        subscribedFeeds: action.subs,
       };
     default:
       return state;
