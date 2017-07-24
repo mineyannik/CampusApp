@@ -68,6 +68,5 @@ export function fetchNewsDataFromFb(fbJsonNewsData) {
 
 function _parseFbDate(fbDate) {
   let dateString = fbDate.slice(0, fbDate.length - 2) + ':' + fbDate.slice(fbDate.length - 2) ;
-  console.log(dateString);
   return new Date(dateString);
 }

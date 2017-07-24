@@ -74,7 +74,7 @@ class NewsScreen extends Component {
           );
       pages.push({
         title: 'Einstellungen',
-        content: <ScrollView bounces={false} feeds={feeds}><NewsSettings></NewsSettings></ScrollView>
+        content: <ScrollView bounces={false}><NewsSettings></NewsSettings></ScrollView>
       })
       return pages;
   }
