@@ -80,13 +80,18 @@ class NewsScreen extends Component {
   }
 
   _renderNewsItems(news) {
-    return (
-      news.map(
-        (newsItem, index) =>
-          <NewsCell key={'t' + index} news={newsItem}
-            onPress={() => this._onNewsItemPressed(newsItem)}/>
-      )
-    );
+    if(news) {
+      return (
+        news.map(
+          (newsItem, index) =>
+            <NewsCell key={'t' + index} news={newsItem}
+              onPress={() => this._onNewsItemPressed(newsItem)}/>
+        )
+      );
+    } else {
+      return (<View></View>);
+    }
+    
   }
 
   _renderScreenContent() {
