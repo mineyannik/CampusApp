@@ -6,18 +6,14 @@ import {
     ActivityIndicator,
     StatusBar,
     StyleSheet,
-    View,
-    AppState,
-    Platform
+    View
 } from 'react-native';
+import FCM, {FCMEvent} from 'react-native-fcm';
 
 import {connect} from 'react-redux';
 
 import WelcomeScreen from './WelcomeScreen';
 import TabsView from './TabsView';
-import PushController from './PushController';
-import PushNotification from 'react-native-push-notification';
-
 
 function selectPropsFromStore(store) {
     return {
@@ -26,33 +22,21 @@ function selectPropsFromStore(store) {
 }
 
 class CampusApp extends Component {
-    constructor(props) {
-        super(props);
-
-        this.handleAppStateChange = this.handleAppStateChange.bind(this);
-    }
-
     componentDidMount() {
-        AppState.addEventListener('change', this.handleAppStateChange);
+        FCM.getFCMToken().then(token => {
+            console.log(token)
+        });
+        this.notificationListener = FCM.on(FCMEvent.Notification, async (notif) => {
+
+        });
+        this.refreshTokenListener = FCM.on(FCMEvent.RefreshToken, (token) => {
+            console.log(token)
+        });
     }
 
     componentWillUnmount() {
-        AppState.removeEventListener('change', this.handleAppStateChange);
-    }
-
-    handleAppStateChange(appState) {
-        if (appState === 'background') {
-            let date = new Date(Date.now() + (5 * 1000));
-
-            if (Platform.OS === 'ios') {
-                date = date.toISOString();
-            }
-
-            PushNotification.localNotificationSchedule({
-                message: "My Notification Message",
-                date,
-            });
-        }
+        this.notificationListener.remove();
+        this.refreshTokenListener.remove();
     }
 
     render() {
@@ -74,7 +58,6 @@ class CampusApp extends Component {
                     barStyle="light-content"
                 />
                 {content}
-                <PushController/>
             </View>
         );
     }
