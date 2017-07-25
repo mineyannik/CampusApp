@@ -10,25 +10,27 @@ import {
   StyleSheet,
   Text,
   View,
+  Button
 } from 'react-native';
 
 import { connect } from 'react-redux';
 
 import NewsCell from './NewsCell';
 import NewsDetails from './NewsDetails';
-import { fetchNews } from './redux';
-import NewsSettings from './NewsSettings';
+import { fetchNews, subscriptionsChanged } from './redux';
+import FeedSetting from './FeedSetting';
 import NewsItem from '../../util/types.js';
 import CampusHeader from '../../util/CampusHeader';
 import ReloadView from '../../util/ReloadView';
 import TabbedSwipeView from '../../util/TabbedSwipeView';
-import { feeds } from '../../util/Constants';
+import { feeds, listViewRowPaddingHorizontal } from '../../util/Constants';
 
 function selectPropsFromStore(store) {
   return {
     news: store.news.news,
     isFetching: store.news.isFetching,
     networkError: store.news.networkError,
+    subscriptions: store.news.subscribedFeeds
   };
 }
 
@@ -36,8 +38,12 @@ class NewsScreen extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {selectedNewsItem: null,};
+    this.state = {
+      selectedNewsItem: null,
+      chosenSubscriptions: this.props.subscriptions
+    };
 
+    this._onFeedSettingChanged = this._onFeedSettingChanged.bind(this);
     this._onBackPress = this._onBackPress.bind(this);
   }
 
@@ -63,20 +69,57 @@ class NewsScreen extends Component {
     return false;
   }
 
+  // 
+  _onFeedSettingChanged(subId) {
+    this.setState({
+      chosenSubscriptions: this.state.chosenSubscriptions.map(
+        (sub, index) => { return index==subId ? !sub : sub }
+      )
+    });
+  }
+
+  _onSaveFeedSettings() {
+    this.props.dispatch(subscriptionsChanged(this.state.chosenSubscriptions));
+  }
   _getPages(news) {
-      let pages = feeds.map(
-              (feed) => {
-                  return {
-                      title: feed.name,
-                      content: <ScrollView bounces={false}>{this._renderNewsItems(news[feed.key])}</ScrollView>,
-                  };
-              }
-          );
-      pages.push({
-        title: 'Einstellungen',
-        content: <ScrollView bounces={false}><NewsSettings></NewsSettings></ScrollView>
-      })
-      return pages;
+    const filteredFeeds = feeds.filter((elem) => {
+      return this.props.subscriptions[elem.subId]
+    });
+    
+    let pages = filteredFeeds.map(
+            (feed) => {
+                return {
+                    title: feed.name,
+                    content: <ScrollView bounces={false}>{this._renderNewsItems(news[feed.key])}</ScrollView>,
+                };
+            }
+        );
+    pages.push({
+      title: 'Einstellungen',
+      content: <ScrollView bounces={false}>{this._renderFeedSettings()}</ScrollView>
+    })
+    return pages;
+  }
+
+  _renderFeedSettings() {
+    const feedSettings =
+      feeds.map(
+        (feed, index) => {
+          return (
+            <FeedSetting key={index} feed={feed} subbed={this.state.chosenSubscriptions[feed.subId]}
+              onPress={() => this._onFeedSettingChanged(feed.subId)}></FeedSetting>
+          )
+        }
+      );
+
+    const btnSave = (<Button key={feeds.length} title='Speichern' onPress={() => this._onSaveFeedSettings()} />);
+    
+    return(
+      <View style={styles.feedSettingsContainer}>
+        {feedSettings}
+        {btnSave}
+      </View>
+    );
   }
 
   _renderNewsItems(news) {
@@ -149,6 +192,9 @@ const styles = StyleSheet.create({
     header: {
         elevation: 0
     },
+    feedSettingsContainer: {
+      paddingHorizontal: listViewRowPaddingHorizontal,
+    }
 });
 
 export default connect(selectPropsFromStore)(NewsScreen);
