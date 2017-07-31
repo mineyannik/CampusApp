@@ -68,8 +68,7 @@ class NewsScreen extends Component {
     }
     return false;
   }
-
-  // 
+ 
   _onFeedSettingChanged(subId) {
     this.setState({
       chosenSubscriptions: this.state.chosenSubscriptions.map(
@@ -80,7 +79,9 @@ class NewsScreen extends Component {
 
   _onSaveFeedSettings() {
     this.props.dispatch(subscriptionsChanged(this.state.chosenSubscriptions));
+    this.props.dispatch(fetchNews());
   }
+
   _getPages(news) {
     const filteredFeeds = feeds.filter((elem) => {
       return this.props.subscriptions[elem.subId]
