@@ -10,9 +10,9 @@ import {
     AppState
 } from 'react-native';
 import FCM, {FCMEvent} from 'react-native-fcm';
-
+import {feeds} from './util/Constants.js';
 import {connect} from 'react-redux';
-
+import {newsUpdateAvailable} from './tabs/news/redux.js';
 import WelcomeScreen from './WelcomeScreen';
 import TabsView from './TabsView';
 
@@ -34,10 +34,10 @@ class CampusApp extends Component {
             console.log(token)
         });
 
-        FCM.getInitialNotification().then(notif=>console.log(notif));
+        FCM.getInitialNotification().then(notif=>this._handlePushNotification(notif));
 
         this.notificationListener = FCM.on(FCMEvent.Notification, (notif) => {
-            console.log(notif);
+            this._handlePushNotification(notif);
         });
         this.refreshTokenListener = FCM.on(FCMEvent.RefreshToken, (token) => {
             console.log(token)
@@ -50,9 +50,16 @@ class CampusApp extends Component {
         AppState.removeEventListener('change', this._handleAppStateChange);
     }
 
+    _handlePushNotification(notif) {
+        if(notif.newsfeed) {
+            const correspondingFeed = feeds.filter(feed => feed.key == notif.newsfeed);
+            this.props.dispatch(newsUpdateAvailable(correspondingFeed));
+        }
+    }
+
     _handleAppStateChange = (nextAppState) => {
         if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-            FCM.getInitialNotification().then(notif=>console.log(notif));
+            FCM.getInitialNotification().then(notif=>this._handlePushNotification(notif));
         }
         this.setState({appState: nextAppState});
     }

@@ -30,7 +30,8 @@ function selectPropsFromStore(store) {
     news: store.news.news,
     isFetching: store.news.isFetching,
     networkError: store.news.networkError,
-    subscriptions: store.news.subscribedFeeds
+    subscriptions: store.news.subscribedFeeds,
+    updatedFeed: store.news.updatedFeed,
   };
 }
 
@@ -49,6 +50,14 @@ class NewsScreen extends Component {
 
   componentWillMount() {
     this.props.dispatch(fetchNews());
+  }
+
+  componentDidMount() {
+    if(this.props.updatedFeed) {
+      this.setState({
+        selectedNewsItem: this.props.news[0],
+      });
+    }
   }
 
   _onNewsItemPressed(newsItem) {

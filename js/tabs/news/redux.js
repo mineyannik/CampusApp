@@ -67,10 +67,18 @@ export function fetchNews() { // a function as actions (enabled by thunk)
 const SUBSCRIPTIONS_CHANGED = 'SUBSCRIPTIONS_CHANGED';
 
 export function subscriptionsChanged(newsubs) {
-  console.log('change');
   return {
     type: SUBSCRIPTIONS_CHANGED,
     subs: newsubs
+  }
+}
+
+const NEWS_UPDATE_AVAILABLE = 'NEWS_UPDATE_AVAILABLE';
+
+export function newsUpdateAvailable(feed) {
+  return {
+    type: NEWS_UPDATE_AVAILABLE,
+    feed: feed
   }
 }
 
@@ -80,7 +88,8 @@ export function news(state = {
   networkError: false,
   lastUpdated: null,
   subscribedFeeds: [true,true,true,true],
-  news: []
+  news: [],
+  updatedFeed: null,
 }, action) {
   switch (action.type) {
     case REQUEST_NEWS:
@@ -103,6 +112,10 @@ export function news(state = {
     case SUBSCRIPTIONS_CHANGED:
       return {...state,
         subscribedFeeds: action.subs,
+      };
+    case NEWS_UPDATE_AVAILABLE:
+      return {...state,
+        updatedFeed: action.feed,
       };
     default:
       return state;
