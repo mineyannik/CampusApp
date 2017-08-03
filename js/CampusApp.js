@@ -6,7 +6,8 @@ import {
     ActivityIndicator,
     StatusBar,
     StyleSheet,
-    View
+    View,
+    AppState
 } from 'react-native';
 import FCM, {FCMEvent} from 'react-native-fcm';
 
@@ -22,12 +23,21 @@ function selectPropsFromStore(store) {
 }
 
 class CampusApp extends Component {
+    state = {
+        appState: AppState.currentState
+    }
+    
     componentDidMount() {
+        AppState.addEventListener('change', this._handleAppStateChange);
+        
         FCM.getFCMToken().then(token => {
             console.log(token)
         });
-        this.notificationListener = FCM.on(FCMEvent.Notification, async (notif) => {
 
+        FCM.getInitialNotification().then(notif=>console.log(notif));
+
+        this.notificationListener = FCM.on(FCMEvent.Notification, (notif) => {
+            console.log(notif);
         });
         this.refreshTokenListener = FCM.on(FCMEvent.RefreshToken, (token) => {
             console.log(token)
@@ -37,6 +47,14 @@ class CampusApp extends Component {
     componentWillUnmount() {
         this.notificationListener.remove();
         this.refreshTokenListener.remove();
+        AppState.removeEventListener('change', this._handleAppStateChange);
+    }
+
+    _handleAppStateChange = (nextAppState) => {
+        if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+            FCM.getInitialNotification().then(notif=>console.log(notif));
+        }
+        this.setState({appState: nextAppState});
     }
 
     render() {
