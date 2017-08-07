@@ -10,11 +10,7 @@
     "date-fns": "^1.20.1",
     "ical.js": "^1.2.2",
     "react": "16.0.0-alpha.12",
-<<<<<<< HEAD
-    "react-native": "0.47.0",
-=======
     "react-native": "0.47.1",
->>>>>>> 64eb47a9d85647d3661ba5ab6e64fa05bc296ea9
     "react-native-fcm": "^8.0.0",
     "react-redux": "^5.0.1",
     "redux": "^3.6.0",
