@@ -57,6 +57,9 @@ public class MainActivity extends ReactActivity {
     public void onNewIntent(Intent intent) {
         if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())) {
             nfcBadgeListener.handleNfcEvent(intent);
+        } else {
+            super.onNewIntent(intent);
+            setIntent(intent);
         }
     }
 
