@@ -2,6 +2,9 @@
 'use strict';
 
 import * as Papa from 'papaparse';
+import RNFS from 'react-native-fs';
+import {roomsDb} from '../../../env.js';
+import {REHYDRATE} from 'redux-persist/constants'
 
 // ACTIONS
 const SEARCH_STARTED = 'SEARCH_STARTED';
@@ -22,17 +25,26 @@ export function searchFinished(results) {
 export function runSearch(searchString) {
   return async function (dispatch, getState) {
     dispatch(searchStarted());
-    
-    //search
-    console.log('searching for: ' + searchString);
-
-    dispatch(searchFinished([]));
+    const {completeList} = getState().rooms;
+    const searchResults = completeList.filter(entry => {
+        return(
+            entry['Raum'].toLowerCase().includes(searchString.toLowerCase()) ||
+            entry['Begriff 1'].toLowerCase().includes(searchString.toLowerCase()) ||
+            entry['Begriff 2'].toLowerCase().includes(searchString.toLowerCase()) ||
+            entry['Begriff 3'].toLowerCase().includes(searchString.toLowerCase()) ||
+            entry['Begriff 4'].toLowerCase().includes(searchString.toLowerCase())
+        );
+    })
+    dispatch(searchFinished(searchResults));
   };
 }
 
 const CSV_PARSE_STARTED = 'CSV_PARSE_STARTED';
 export function csvParseStarted() {
-    type: CSV_PARSE_STARTED
+    return {
+        type: CSV_PARSE_STARTED,
+    }
+    
 }
 
 const CSV_PARSE_FINISHED = 'CSV_PARSE_FINSIHED';
@@ -45,13 +57,31 @@ export function csvParseFinished(parsedList) {
 
 export function doInitialParseOfCsvData() {
     return async function (dispatch, getState) {
-        //dispatch(csvParseStarted());
-        const results = Papa.parse('../../rooms-demo.csv', {
-            download: true,
+        dispatch(csvParseStarted());
+        const results = roomsDb;
+                /*const csvFile = await RNFS.readDirAssets('/');
+        console.log(csvFile);
+
+        const file = await RNFS.readFile(appRootPath + '/demo-rooms.csv');
+        const results = await Papa.parse(csvFile, {
             header: true,
-            worker: false
-        });
-        //dispatch(csvParseFinished(results));
+        });*/
+        dispatch(csvParseFinished(results));
+    }
+}
+
+const SELECT_ROOM = 'SELECT_ROOM';
+export function selectRoom(room) {
+    return {
+        type: SELECT_ROOM,
+        selectedRoom: room
+    }
+}
+
+const UNSELECT_ROOM = 'UNSELECT_ROOM';
+export function unselectRoom() {
+    return {
+        type: UNSELECT_ROOM
     }
 }
 
@@ -59,7 +89,8 @@ export function doInitialParseOfCsvData() {
 export function rooms(state = {
   isLoading: false,
   searchResults: null,
-  completeList: null
+  completeList: null,
+  selectedRoom: null
 }, action) {
   switch (action.type) {
     case SEARCH_STARTED:
@@ -80,6 +111,20 @@ export function rooms(state = {
             isLoading: false,
             completeList: action.parsedList
         };
+    case SELECT_ROOM:
+        return {...state,
+            selectedRoom: action.selectedRoom
+        };
+    case UNSELECT_ROOM:
+        return {...state,
+            selectedRoom: null
+        };
+    case REHYDRATE:
+        const incoming = action.payload.rooms;
+        if (incoming) {
+            return {...state, ...incoming, searchResults: null} // reset cached search results
+        }
+        return state;
     default:
       return state;
   }

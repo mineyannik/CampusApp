@@ -3,31 +3,32 @@
 
 import React, { Component } from 'react';
 import {
-  ScrollView,
   StyleSheet,
   View,
   Text,
   TextInput,
+  ActivityIndicator,
+  Platform,
+  BackHandler,
 } from 'react-native';
 import {connect} from 'react-redux';
 import CampusHeader from '../../util/CampusHeader';
 import RoomsList from './RoomsList';
-import {doInitialParseOfCsvData, runSearch} from './redux';
+import RoomDetails from './RoomDetails';
+import {doInitialParseOfCsvData, runSearch, selectRoom, unselectRoom} from './redux';
 
 function selectPropsFromStore(store) {
   return {
     isLoading: store.rooms.isLoading,
-    searchresults: store.rooms.searchresults,
+    searchResults: store.rooms.searchResults,
     completeList: store.rooms.completeList,
+    selectedRoom: store.rooms.selectedRoom
   };
 }
 
 export class RoomsScreen extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            searchString: ''
-        }
     }
 
     componentWillMount() {
@@ -35,30 +36,65 @@ export class RoomsScreen extends Component {
         if(!this.props.completeList) {
             this.props.dispatch(doInitialParseOfCsvData());
         }
-        console.log(this.props.completeList);
     }
 
     render() {
-        return (
-        <View style={styles.container}>
-            <CampusHeader title='Räume' style={styles.header}/>
-            <TextInput
-                placeholder='Raumsuche'
-                value={this.state.searchString}
-                onChange={this._doSearch.bind(this)}
-                underlineColorAndroid='transparent'
-                style={styles.searchBox} />
-            <RoomsList
-                isLoading={this.props.isLoading}
-                searchResults={this.props.searchResults}
-                completeList={this.props.completeList} />
-        </View>
-        )
+        if((!this.props.isLoading) && this.props.completeList) {
+            if(!this.props.selectedRoom) {
+                return (
+                    <View style={styles.container}>
+                        <CampusHeader title='Räume' style={styles.header}/>
+                        <TextInput
+                            placeholder='Raumsuche'
+                            onChange={this._doSearch.bind(this)}
+                            underlineColorAndroid='transparent'
+                            style={styles.searchBox} />
+                        <RoomsList
+                            searchResults={this.props.searchResults}
+                            completeList={this.props.completeList}
+                            selectedRoom={this.props.selectedRoom}
+                            dispatch={this.props.dispatch} 
+                            onSelectRoom={this._viewRoomDetails.bind(this)} />
+                    </View>
+                );
+            } else {  
+                return (
+                    <View style={styles.container}>
+                        <CampusHeader title='Räume' style={styles.header}/>
+                        <RoomDetails room={this.props.selectedRoom}></RoomDetails>
+                    </View>
+                );
+            }
+        } else {
+            return (
+                <View style={styles.container}>
+                    <CampusHeader title='Räume' style={styles.header}/>
+                    <ActivityIndicator animating={true}></ActivityIndicator>
+                </View>
+            );
+        }
+    }
+
+    _viewRoomDetails(room) {
+        if(Platform.OS === 'android') {
+            BackHandler.addEventListener('hardwareBackPress', this._onBackPress.bind(this));
+        }
+        this.props.dispatch(selectRoom(room));
+    }
+
+    _onBackPress() {
+        if(this.props.selectedRoom !== null) {
+            if(Platform.OS === 'android'){
+                BackHandler.removeEventListener('hardwareBackPress', this._onBackPress);
+            }
+            this.props.dispatch(unselectRoom());
+            return true;
+        }
+        return false;
     }
 
     _doSearch(event) {
         const searchString = event.nativeEvent.text;
-        this.setState({searchString: searchString});
         this.props.dispatch(runSearch(searchString));
     }
 }

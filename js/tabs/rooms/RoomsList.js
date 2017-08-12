@@ -3,28 +3,45 @@
 
 import React, { Component } from 'react';
 import {
-  ScrollView,
   StyleSheet,
   View,
   Text,
-  TextInput,
   FlatList,
 } from 'react-native';
+import RoomsCell from './RoomsCell';
+
 
 export default class RoomsList extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            selectedRooms: null
-        }
     }
 
     render() {
         return (
-        <View style={styles.container}>
-            <FlatList data={[{key: 'demo1'}, {key: 'demo2'}]} renderItem={({item}) => <Text>{item.key}</Text>} />
-        </View>
-        )
+            <View>
+                <FlatList
+                    data={this._prepareData()}
+                    renderItem={({item}) => <RoomsCell onPress={() => this.props.onSelectRoom(item)} heading={item['Begriff 1']} subHeading={item['Raum']}/>}
+                />
+            </View>
+        );
+    }
+
+
+    _prepareData() {
+        if(this.props.searchResults) {
+            return this._addUniqueKeys(this.props.searchResults);
+        } else {
+            return this._addUniqueKeys(this.props.completeList);
+        }
+    }
+
+    _addUniqueKeys(inputArray) {
+        return inputArray.map((val, index) => {
+            let tmp = val;
+            tmp.key = index;
+            return tmp;
+        });
     }
 }
 
