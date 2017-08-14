@@ -22,8 +22,22 @@ function selectPropsFromStore(store) {
 }
 
 class CampusApp extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            notificationTopic: false
+        };
+        this.handleNotification = this.handleNotification.bind(this)
+    }
+
+    handleNotification(feed) {
+        this.setState({
+            notificationTopic: feed
+        });
+    }
+
     render() {
-        let content = <TabsView/>;
+        let content = <TabsView notificationTopic={this.state.notificationTopic}/>;
         if (this.props.loading) {
             content =
                 <View style={styles.center}>
@@ -35,7 +49,7 @@ class CampusApp extends Component {
 
         return (
             <View style={styles.container}>
-                <PushController/>
+                <PushController dispatch={this.props.dispatch} handleNotification={this.handleNotification}/>
                 <StatusBar
                     translucent={true}
                     backgroundColor="rgba(0, 0, 0, 0.2)"

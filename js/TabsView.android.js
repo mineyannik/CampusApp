@@ -85,7 +85,7 @@ export default class TabsView extends Component {
   _renderTabContent() {
     switch (this.state.selectedTab) {
       case 'news':
-        return <NewsScreen/>;
+        return <NewsScreen notificationTopic={this.props.notificationTopic}/>;
       case 'schedule':
         return <ScheduleScreen/>;
       case 'canteen':

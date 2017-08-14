@@ -40,7 +40,8 @@ class NewsScreen extends Component {
 
     this.state = {
       selectedNewsItem: null,
-      chosenSubscriptions: this.props.subscriptions
+      chosenSubscriptions: this.props.subscriptions,
+      isNotification: false
     };
 
     this._onFeedSettingChanged = this._onFeedSettingChanged.bind(this);
@@ -49,6 +50,15 @@ class NewsScreen extends Component {
 
   componentWillMount() {
     this.props.dispatch(fetchNews());
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.notificationTopic && !this.state.isNotification) {
+      this.setState({
+        selectedNewsItem: this.props.news[nextProps.notificationTopic][0],
+        isNotification: true
+      });
+    }
   }
 
   _onNewsItemPressed(newsItem) {
