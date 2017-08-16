@@ -14,6 +14,8 @@ import { connect } from 'react-redux';
 import WelcomeScreen from './WelcomeScreen';
 import TabsView from './TabsView';
 
+const RNFS = require('react-native-fs');
+
 function selectPropsFromStore(store) {
   return {
     selectedRole: store.settings.selectedRole,
@@ -21,6 +23,12 @@ function selectPropsFromStore(store) {
 }
 
 class CampusApp extends Component {
+  componentWillMount() {
+    RNFS.readFileAssets('test.csv').then((file) => {
+      console.log('file content: ', file);
+    })
+  }
+
   render() {
     let content = <TabsView/>;
     if(this.props.loading) {
