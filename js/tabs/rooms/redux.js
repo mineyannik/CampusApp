@@ -25,16 +25,22 @@ export function searchFinished(results) {
 export function runSearch(searchString) {
   return async function (dispatch, getState) {
     dispatch(searchStarted());
-    const {completeList} = getState().rooms;
-    const searchResults = completeList.filter(entry => {
-        return(
-            entry['Raum'].toLowerCase().includes(searchString.toLowerCase()) ||
-            entry['Begriff 1'].toLowerCase().includes(searchString.toLowerCase()) ||
-            entry['Begriff 2'].toLowerCase().includes(searchString.toLowerCase()) ||
-            entry['Begriff 3'].toLowerCase().includes(searchString.toLowerCase()) ||
-            entry['Begriff 4'].toLowerCase().includes(searchString.toLowerCase())
-        );
-    })
+    let searchResults = [];
+    try {
+        const {completeList} = getState().rooms;
+        searchResults = completeList.filter(entry => {
+            return(
+                entry['Raum'].toLowerCase().includes(searchString.toLowerCase()) ||
+                entry['Begriff 1'].toLowerCase().includes(searchString.toLowerCase()) ||
+                entry['Begriff 2'].toLowerCase().includes(searchString.toLowerCase()) ||
+                entry['Begriff 3'].toLowerCase().includes(searchString.toLowerCase()) ||
+                entry['Begriff 4'].toLowerCase().includes(searchString.toLowerCase())
+            );
+        });
+    } catch(e) {
+        console.log('Error while searching for: ' + searchString);
+        console.log(e);
+    }
     dispatch(searchFinished(searchResults));
   };
 }
@@ -58,15 +64,22 @@ export function csvParseFinished(parsedList) {
 export function doInitialParseOfCsvData() {
     return async function (dispatch, getState) {
         dispatch(csvParseStarted());
-        const results = roomsDb;
-                /*const csvFile = await RNFS.readDirAssets('/');
-        console.log(csvFile);
+        let data = [];
+        try {
+            const csvFile = await RNFS.readFileAssets('room-db.csv', 'ascii').then(file => {
+                return file;
+            });
+            const parseResult = await Papa.parse(csvFile, {
+                header: true,
+                skipEmptyLines: true
+            });
+            data = parseResult.data;
+        } catch(e) {
+            console.log('Error while parsing csv data:');
+            console.log(e);
+        }
 
-        const file = await RNFS.readFile(appRootPath + '/demo-rooms.csv');
-        const results = await Papa.parse(csvFile, {
-            header: true,
-        });*/
-        dispatch(csvParseFinished(results));
+        dispatch(csvParseFinished(data));
     }
 }
 

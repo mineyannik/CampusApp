@@ -15,6 +15,7 @@ import {connect} from 'react-redux';
 import CampusHeader from '../../util/CampusHeader';
 import RoomsList from './RoomsList';
 import RoomDetails from './RoomDetails';
+import {listViewRowPaddingHorizontal} from '../../util/Constants';
 import {doInitialParseOfCsvData, runSearch, selectRoom, unselectRoom} from './redux';
 
 function selectPropsFromStore(store) {
@@ -54,7 +55,8 @@ export class RoomsScreen extends Component {
                             completeList={this.props.completeList}
                             selectedRoom={this.props.selectedRoom}
                             dispatch={this.props.dispatch} 
-                            onSelectRoom={this._viewRoomDetails.bind(this)} />
+                            onSelectRoom={this._viewRoomDetails.bind(this)}
+                            style={styles.list} />
                     </View>
                 );
             } else {  
@@ -69,7 +71,7 @@ export class RoomsScreen extends Component {
             return (
                 <View style={styles.container}>
                     <CampusHeader title='Räume' style={styles.header}/>
-                    <ActivityIndicator animating={true}></ActivityIndicator>
+                    <ActivityIndicator animating={true} style={styles.center}></ActivityIndicator>
                 </View>
             );
         }
@@ -107,12 +109,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchBox: {
-    paddingLeft: 30,
-    fontSize: 18,
-    height: 10,
     flex: .1,
-    borderWidth: 9,
-    borderColor: '#E4E4E4',
+    borderBottomColor: "#CCC",
+    borderBottomWidth: 2,
+    paddingHorizontal: listViewRowPaddingHorizontal,
+  },
+  list: {
+      flex: 1
+  },
+  center: {
+    flex: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
   }
 });
 

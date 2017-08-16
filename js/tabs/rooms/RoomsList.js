@@ -4,7 +4,7 @@
 import React, { Component } from 'react';
 import {
   StyleSheet,
-  View,
+  ScrollView,
   Text,
   FlatList,
 } from 'react-native';
@@ -18,12 +18,12 @@ export default class RoomsList extends Component {
 
     render() {
         return (
-            <View>
+            <ScrollView>
                 <FlatList
                     data={this._prepareData()}
                     renderItem={({item}) => <RoomsCell onPress={() => this.props.onSelectRoom(item)} heading={item['Begriff 1']} subHeading={item['Raum']}/>}
                 />
-            </View>
+            </ScrollView>
         );
     }
 
