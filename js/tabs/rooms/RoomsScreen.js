@@ -38,13 +38,24 @@ export class RoomsScreen extends Component {
             this.props.dispatch(doInitialParseOfCsvData());
         }
     }
-
+    _setHeader() {
+        const leftActionItem = {
+            title: 'Back',
+            icon: require('../../img/arrow-back.png'),
+            onPress: this._onBackPress.bind(this),
+          };
+          if(this.props.selectedRoom) {
+              return(<CampusHeader title='Räume' leftActionItem={leftActionItem} style={styles.header}></CampusHeader>);
+          } else {
+              return(<CampusHeader title='Räume' style={styles.header}></CampusHeader>);
+          }
+    }
     render() {
         if((!this.props.isLoading) && this.props.completeList) {
             if(!this.props.selectedRoom) {
                 return (
                     <View style={styles.container}>
-                        <CampusHeader title='Räume' style={styles.header}/>
+                        {this._setHeader()}
                         <TextInput
                             placeholder='Raumsuche'
                             onChange={this._doSearch.bind(this)}
@@ -62,7 +73,7 @@ export class RoomsScreen extends Component {
             } else {  
                 return (
                     <View style={styles.container}>
-                        <CampusHeader title='Räume' style={styles.header}/>
+                        {this._setHeader()}
                         <RoomDetails room={this.props.selectedRoom}></RoomDetails>
                     </View>
                 );
@@ -70,7 +81,7 @@ export class RoomsScreen extends Component {
         } else {
             return (
                 <View style={styles.container}>
-                    <CampusHeader title='Räume' style={styles.header}/>
+                    {this._setHeader()}
                     <ActivityIndicator animating={true} style={styles.center}></ActivityIndicator>
                 </View>
             );
