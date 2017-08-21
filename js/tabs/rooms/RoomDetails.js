@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import { bigFont, smallFont, listViewRowPaddingHorizontal } from '../../util/Constants';
 import Colors from '../../util/Colors';
 
@@ -46,7 +46,7 @@ export default class RoomDetails extends Component {
     }
 
 }
-
+const win = Dimensions.get('window');
 
 const styles = StyleSheet.create({
     container: {
@@ -59,7 +59,8 @@ const styles = StyleSheet.create({
 
     },
     headImage: {
-        flex: 3
+        flex: 3,
+        width: win.width,
     },
     heading: {
         fontSize: bigFont
