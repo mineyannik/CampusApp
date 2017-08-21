@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import { bigFont, smallFont, listViewRowPaddingHorizontal, listViewRowPaddingVertical } from '../../util/Constants';
+import { bigFont, smallFont, listViewRowPaddingHorizontal } from '../../util/Constants';
 import Colors from '../../util/Colors';
 
 export default class RoomDetails extends Component {
@@ -11,41 +11,37 @@ export default class RoomDetails extends Component {
     render() {
         return(
             <View style={styles.container}>
-                <View style={styles.section}>
-                    <Image style={styles.icons} resizeMode='contain' source={require('./img/rooms-icon-head.png')} />
-                    <View style={styles.textSection}>
-                        <Text style={styles.heading}>{this.props.room["Begriff 1"]}</Text>
-                        <Text style={styles.subHeading}>{this.props.room["Begriff 2"]}</Text>
+                <Image style={styles.headImage} resizeMode='stretch' source={require('./img/rooms/overview.png')} />
+                <View style={styles.sectionContainer}>
+                    <View style={styles.section}>
+                        <Image style={styles.icons} resizeMode='contain' source={require('./img/rooms-icon-head.png')} />
+                        <View style={styles.textSection}>
+                            <Text style={styles.heading}>{this.props.room["Begriff 1"]}</Text>
+                            <Text style={styles.subHeading}>{this.props.room["Begriff 2"]}</Text>
+                        </View>
                     </View>
-                </View>
 
-                <View style={styles.section}>
-                    <Image style={styles.icons} resizeMode='contain' source={require('./img/rooms-icon-location.png')}/>
-                    <View style={styles.textSection}>
-                        <Text style={styles.heading}>{this.props.room["Raum"]}</Text>
+                    <View style={styles.section}>
+                        <Image style={styles.icons} resizeMode='contain' source={require('./img/rooms-icon-location.png')}/>
+                        <View style={styles.textSection}>
+                            <Text style={styles.heading}>{this.props.room["Raum"]}</Text>
+                        </View>
                     </View>
-                </View>
 
-                <View style={styles.section}>
-                    <Image style={styles.icons} resizeMode='contain' source={require('./img/rooms-icon-tags.png')}/>
-                    <View style={styles.textSection}>
-                        {/*<Text style={styles.location}>Tags:  {this._getTags(this.props.room).join(', ')}</Text>*/}
+                    <View style={styles.section}>
+                        <Image style={styles.icons} resizeMode='contain' source={require('./img/rooms-icon-tags.png')}/>
+                        <View style={styles.textSection}>
+                            <Text style={styles.heading}>Tags:</Text><Text style={styles.subHeading}>{this._getTags(this.props.room).join(', ')}</Text>
+                        </View>
                     </View>
                 </View>
             </View>
         );
     }
     _getTags(room) {
-        return Object(room).keys.map(key => {
-            if(
-                key == 'Gebäude' ||
-                key == 'Begriff 1' ||
-                key == 'Begriff 2' ||
-                key == 'Begriff 3' ||
-                key == 'Begriff 4'
-            ) {
-                return this.props.room[key];
-            }
+        const tags = new Array(room['Gebäude'], room['Begriff 1'], room['Begriff 2'], room['Begriff 3'], room['Begriff 4']);
+        return tags.filter(tag => {
+            return (tag != '');
         });
     }
 
@@ -54,8 +50,16 @@ export default class RoomDetails extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: listViewRowPaddingHorizontal,
-        paddingVertical: listViewRowPaddingVertical,
+        flex: 1,
+    },
+    sectionContainer: {
+        paddingVertical: 1,
+        flex: 2,
+        justifyContent: 'space-between',
+
+    },
+    headImage: {
+        flex: 3
     },
     heading: {
         fontSize: bigFont
@@ -70,8 +74,9 @@ const styles = StyleSheet.create({
     },
     section: {
         flexDirection: 'row',
-        marginBottom: 20,
-        alignItems: 'center'
+        alignItems: 'center',
+        paddingHorizontal: listViewRowPaddingHorizontal,
+        paddingVertical: 15,
     },
     textSection: {
         flex: 4
