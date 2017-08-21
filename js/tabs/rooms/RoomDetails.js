@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions, TouchableHighlight } from 'react-native';
 import { bigFont, smallFont, listViewRowPaddingHorizontal } from '../../util/Constants';
+import { mapsLocations } from '../../../env.js';
+import { openDirections } from './helpers';
 import Colors from '../../util/Colors';
 
 export default class RoomDetails extends Component {
@@ -21,12 +23,16 @@ export default class RoomDetails extends Component {
                         </View>
                     </View>
 
+                    <TouchableHighlight underlayColor='#CCC' onPress={() => this._openMaps(this.props.room)}>
                     <View style={styles.section}>
                         <Image style={styles.icons} resizeMode='contain' source={require('./img/rooms-icon-location.png')}/>
+                        
                         <View style={styles.textSection}>
                             <Text style={styles.heading}>{this.props.room["Raum"]}</Text>
                         </View>
                     </View>
+                    </TouchableHighlight>
+                    
 
                     <View style={styles.section}>
                         <Image style={styles.icons} resizeMode='contain' source={require('./img/rooms-icon-tags.png')}/>
@@ -37,6 +43,17 @@ export default class RoomDetails extends Component {
                 </View>
             </View>
         );
+    }
+
+    _openMaps(room) {
+        const building = room['Gebäude'];
+        try {
+            const lat = mapsLocations[building].lat;
+            const long = mapsLocations[building].long;
+            openDirections(lat, long);
+        } catch(e) {
+            console.log(e);
+        }
     }
     _getTags(room) {
         const tags = new Array(room['Gebäude'], room['Begriff 1'], room['Begriff 2'], room['Begriff 3'], room['Begriff 4']);
@@ -56,6 +73,8 @@ const styles = StyleSheet.create({
         paddingVertical: 1,
         flex: 2,
         justifyContent: 'space-between',
+        borderTopWidth: 2,
+        borderTopColor: '#CCC',
 
     },
     headImage: {
