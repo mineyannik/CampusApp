@@ -17,7 +17,7 @@ import { connect } from 'react-redux';
 
 import NewsCell from './NewsCell';
 import NewsDetails from './NewsDetails';
-import { fetchNews, subscriptionsChanged } from './redux';
+import { fetchNews, subscriptionsChanged, updateFCMSubscriptions } from './redux';
 import FeedSetting from './FeedSetting';
 import NewsItem from '../../util/types.js';
 import CampusHeader from '../../util/CampusHeader';
@@ -44,12 +44,13 @@ class NewsScreen extends Component {
       isNotification: false
     };
 
-    this._onFeedSettingChanged = this._onFeedSettingChanged.bind(this);
+    this.onFeedSettingChanged = this.onFeedSettingChanged.bind(this);
     this._onBackPress = this._onBackPress.bind(this);
   }
 
   componentWillMount() {
     this.props.dispatch(fetchNews());
+    this.props.dispatch(updateFCMSubscriptions());
   }
 
   componentWillReceiveProps(nextProps) {
@@ -61,7 +62,7 @@ class NewsScreen extends Component {
     }
   }
 
-  _onNewsItemPressed(newsItem) {
+  onNewsItemPressed(newsItem) {
     if(Platform.OS === 'android'){
       BackHandler.addEventListener('hardwareBackPress', this._onBackPress);
     }
@@ -79,7 +80,7 @@ class NewsScreen extends Component {
     return false;
   }
  
-  _onFeedSettingChanged(subId) {
+  onFeedSettingChanged(subId) {
     this.setState({
       chosenSubscriptions: this.state.chosenSubscriptions.map(
         (sub, index) => { return index==subId ? !sub : sub }
@@ -87,8 +88,9 @@ class NewsScreen extends Component {
     });
   }
 
-  _onSaveFeedSettings() {
+  onSaveFeedSettings() {
     this.props.dispatch(subscriptionsChanged(this.state.chosenSubscriptions));
+    this.props.dispatch(updateFCMSubscriptions());
     this.props.dispatch(fetchNews());
   }
 
@@ -118,12 +120,12 @@ class NewsScreen extends Component {
         (feed, index) => {
           return (
             <FeedSetting key={index} feed={feed} subbed={this.state.chosenSubscriptions[feed.subId]}
-              onPress={() => this._onFeedSettingChanged(feed.subId)}></FeedSetting>
+              onPress={() => this.onFeedSettingChanged(feed.subId)}></FeedSetting>
           )
         }
       );
 
-    const btnSave = (<Button key={feeds.length} title='Speichern' onPress={() => this._onSaveFeedSettings()} />);
+    const btnSave = (<Button key={feeds.length} title='Speichern' onPress={() => this.onSaveFeedSettings()} />);
     
     return(
       <View style={styles.feedSettingsContainer}>
@@ -139,7 +141,7 @@ class NewsScreen extends Component {
         news.map(
           (newsItem, index) =>
             <NewsCell key={'t' + index} news={newsItem}
-              onPress={() => this._onNewsItemPressed(newsItem)}/>
+              onPress={() => this.onNewsItemPressed(newsItem)}/>
         )
       );
     } else {

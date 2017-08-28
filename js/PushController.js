@@ -21,11 +21,11 @@ export default class PushController extends Component {
         this.notificationListener = FCM.on(FCMEvent.Notification, notif => {
             console.log("Notification", notif);
             this._handlePushNotification(notif);
-
-            this.refreshTokenListener = FCM.on(FCMEvent.RefreshToken, token => {
-                console.log("TOKEN (refreshUnsubscribe)", token);
-            });
-        })
+        });
+        
+        this.refreshTokenListener = FCM.on(FCMEvent.RefreshToken, token => {
+            console.log("TOKEN (refreshUnsubscribe)", token);
+        });
     }
 
     componentWillUnmount() {

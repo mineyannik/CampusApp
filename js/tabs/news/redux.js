@@ -5,6 +5,7 @@ import fetchNewsData from './helpers';
 import { feeds } from '../../util/Constants';
 import { fbAccessToken } from '../../../env.js';
 import { fetchNewsDataFromFb } from './helpers';
+import FCM from 'react-native-fcm';
 
 // ACTIONS
 // action that is dispatched whenever the news will we fetched
@@ -67,10 +68,22 @@ export function fetchNews() { // a function as actions (enabled by thunk)
 const SUBSCRIPTIONS_CHANGED = 'SUBSCRIPTIONS_CHANGED';
 
 export function subscriptionsChanged(newsubs) {
-  console.log('change');
   return {
     type: SUBSCRIPTIONS_CHANGED,
     subs: newsubs
+  }
+}
+
+export function updateFCMSubscriptions() {
+  return async function(dispatch, getState) {
+    const { subscribedFeeds } = getState().news;
+    feeds.map((val, index) => {
+      if(subscribedFeeds[index]) {
+        FCM.subscribeToTopic(val.key);
+      } else {
+        FCM.unsubscribeFromTopic(val.key);
+      }
+    });
   }
 }
 
