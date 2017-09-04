@@ -23,6 +23,7 @@ import NewsItem from '../../util/types.js';
 import CampusHeader from '../../util/CampusHeader';
 import ReloadView from '../../util/ReloadView';
 import TabbedSwipeView from '../../util/TabbedSwipeView';
+import Colors from '../../util/Colors.js';
 import { feeds, listViewRowPaddingHorizontal } from '../../util/Constants';
 
 function selectPropsFromStore(store) {
@@ -125,7 +126,10 @@ class NewsScreen extends Component {
         }
       );
 
-    const btnSave = (<Button key={feeds.length} title='Speichern' onPress={() => this.onSaveFeedSettings()} />);
+    const btnSave =
+    <View style={styles.btnSave}>
+      <Button color={Colors.dhbwRed} key={feeds.length} title='Speichern' onPress={() => this.onSaveFeedSettings()} />
+    </View>;
     
     return(
       <View style={styles.feedSettingsContainer}>
@@ -198,7 +202,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
     },
     center: {
-        flex: 2,
+        flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -207,6 +211,9 @@ const styles = StyleSheet.create({
     },
     feedSettingsContainer: {
       paddingHorizontal: listViewRowPaddingHorizontal,
+    },
+    btnSave: {
+      marginTop: 15
     }
 });
 
