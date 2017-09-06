@@ -4,7 +4,6 @@
 import React, { Component } from 'react';
 import {
   StyleSheet,
-  Text,
   View,
   ViewPagerAndroid,
 } from 'react-native';
@@ -15,7 +14,7 @@ import PagerTab from './PagerTab';
 export default class TabbedSwipeView extends Component {
   constructor(props) {
     super(props);
-    this.state = {selectedIndex: 0,};
+    this.state = {selectedIndex: props.selectedIndex ? props.selectedIndex : 0};
 
     this._onPageSelected = this._onPageSelected.bind(this);
   }
@@ -48,6 +47,7 @@ export default class TabbedSwipeView extends Component {
         </View>
         <ViewPagerAndroid style={styles.container}
           onPageSelected={this._onPageSelected}
+          initialPage={this.state.selectedIndex}
           ref={viewPager => { this._viewPager = viewPager; }}>
           {pages}
         </ViewPagerAndroid>

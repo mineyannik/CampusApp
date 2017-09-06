@@ -27,17 +27,20 @@ class CampusApp extends Component {
         this.state = {
             notificationTopic: false
         };
-        this.handleNotification = this.handleNotification.bind(this)
+        this.handleNotification = this.handleNotification.bind(this);
+        this.onDataReceived = this.onDataReceived.bind(this)
     }
 
     handleNotification(feed) {
-        this.setState({
-            notificationTopic: feed
-        });
+        this.setState({notificationTopic: feed});
+    }
+
+    onDataReceived() {
+        this.setState({notificationTopic: false});
     }
 
     render() {
-        let content = <TabsView notificationTopic={this.state.notificationTopic}/>;
+        let content = <TabsView notificationTopic={this.state.notificationTopic} onDataReceived={this.onDataReceived}/>;
         if (this.props.loading) {
             content =
                 <View style={styles.center}>

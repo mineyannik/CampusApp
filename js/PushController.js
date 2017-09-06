@@ -44,17 +44,18 @@ export default class PushController extends Component {
     _handlePushNotification(notif) {
         if (notif !== null && notif.hasOwnProperty("newsfeed")) {
             const correspondingFeed = feeds.filter(feed => feed.key === notif.newsfeed);
-            this.setState({key: correspondingFeed[0].key});
+            const key = correspondingFeed[0].key;
+            this.setState({key: key});
             if (AppState.currentState === 'active' && !notif.opened_from_tray) {
                 FCM.presentLocalNotification({
                     title: notif.fcm.title,
                     body: notif.fcm.body,
                     show_in_foreground: true,
-                    local: true
+                    local: true,
+                    newsfeed: key
                 });
             } else {
-                console.log('hellooo');
-                this.props.handleNotification(correspondingFeed[0].key);
+                this.props.handleNotification(key);
             }
         }
     }

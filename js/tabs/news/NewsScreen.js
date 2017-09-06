@@ -8,7 +8,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   View,
   Button
 } from 'react-native';
@@ -40,8 +39,8 @@ class NewsScreen extends Component {
 
     this.state = {
       selectedNewsItem: null,
-      chosenSubscriptions: this.props.subscriptions,
-      isNotification: false
+      chosenSubscriptions: props.subscriptions,
+      selectedIndex: 0,
     };
 
     this.onFeedSettingChanged = this.onFeedSettingChanged.bind(this);
@@ -54,19 +53,27 @@ class NewsScreen extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if(nextProps.notificationTopic && !this.state.isNotification) {
-      this.setState({
-        selectedNewsItem: this.props.news[nextProps.notificationTopic][0],
-        isNotification: true
-      });
+    if(nextProps.notificationTopic) {
+      this.setNewsItem(this.props.news[nextProps.notificationTopic][0], nextProps.notificationTopic);
     }
   }
 
-  onNewsItemPressed(newsItem) {
+  onNewsItemPressed(newsItem, topic) {
     if(Platform.OS === 'android'){
       BackHandler.addEventListener('hardwareBackPress', this._onBackPress);
     }
-    this.setState({ selectedNewsItem: newsItem });
+    this.setNewsItem(newsItem, topic)
+  }
+
+  setNewsItem(newsItem, topic) {
+    const filteredFeeds = feeds.filter((elem) => {
+      return this.props.subscriptions[elem.subId]
+    });
+    const index = filteredFeeds.map((feed) => { return feed.key; }).indexOf(topic);
+    this.setState({
+      selectedNewsItem: newsItem,
+      selectedIndex: index
+    });
   }
 
   _onBackPress() {
@@ -74,7 +81,8 @@ class NewsScreen extends Component {
       if(Platform.OS === 'android'){
         BackHandler.removeEventListener('hardwareBackPress', this._onBackPress);
       }
-      this.setState({selectedNewsItem: null})
+      this.setState({selectedNewsItem: null});
+      this.props.onDataReceived();
       return true; // Back button handled
     }
     return false;
@@ -103,7 +111,7 @@ class NewsScreen extends Component {
             (feed) => {
                 return {
                     title: feed.name,
-                    content: <ScrollView bounces={false}>{this._renderNewsItems(news[feed.key])}</ScrollView>,
+                    content: <ScrollView bounces={false}>{this._renderNewsItems(news[feed.key], feed.key)}</ScrollView>,
                 };
             }
         );
@@ -120,7 +128,7 @@ class NewsScreen extends Component {
         (feed, index) => {
           return (
             <FeedSetting key={index} feed={feed} subbed={this.state.chosenSubscriptions[feed.subId]}
-              onPress={() => this.onFeedSettingChanged(feed.subId)}></FeedSetting>
+              onPress={() => this.onFeedSettingChanged(feed.subId)}/>
           )
         }
       );
@@ -135,17 +143,17 @@ class NewsScreen extends Component {
     );
   }
 
-  _renderNewsItems(news) {
+  _renderNewsItems(news, topic) {
     if(news) {
       return (
         news.map(
           (newsItem, index) =>
             <NewsCell key={'t' + index} news={newsItem}
-              onPress={() => this.onNewsItemPressed(newsItem)}/>
+              onPress={() => this.onNewsItemPressed(newsItem, topic)}/>
         )
       );
     } else {
-      return (<View></View>);
+      return (<View/>);
     }
     
   }
@@ -170,7 +178,7 @@ class NewsScreen extends Component {
     }
 
     return (
-        <TabbedSwipeView pages={this._getPages(news)}/>
+        <TabbedSwipeView selectedIndex={this.state.selectedIndex} pages={this._getPages(news)}/>
     );
   }
 
