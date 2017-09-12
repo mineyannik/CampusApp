@@ -15,9 +15,10 @@ import NewsScreen from './tabs/news/NewsScreen';
 import ScheduleScreen from './tabs/schedule/ScheduleScreen';
 import CanteenScreen from './tabs/canteen/CanteenScreen';
 import ServiceScreen from './tabs/service/ServiceScreen';
+import RoomsScreen from './tabs/rooms/RoomsScreen';
 import ImprintScreen from './tabs/service/ImprintScreen';
 
-type Tab = 'news' | 'schedule' | 'canteen' | 'service' | 'imprint';
+type Tab = 'news' | 'schedule' | 'canteen' | 'service' | 'rooms' | 'imprint';
 
 type State = {
   selectedTab: Tab;
@@ -73,6 +74,12 @@ export default class TabsView extends Component {
           icon={require('./tabs/service/img/service-icon.png')}
           selectedIcon={require('./tabs/service/img/service-icon-active.png')}/>
         <DrawerItem
+          title='Räume'
+          isSelected={this.state.selectedTab === 'rooms'}
+          onPress={() => this._onDrawerItemPressed('rooms')}
+          icon={require('./tabs/rooms/img/rooms-icon.png')}
+          selectedIcon={require('./tabs/rooms/img/rooms-icon-active.png')}/>
+        <DrawerItem
           title='Impressum'
           isSelected={this.state.selectedTab === 'imprint'}
           onPress={() => this._onDrawerItemPressed('imprint')}
@@ -95,6 +102,8 @@ export default class TabsView extends Component {
         return <CanteenScreen/>;
       case 'service':
         return <ServiceScreen/>;
+      case 'rooms':
+        return <RoomsScreen/>;
       case 'imprint':
         return <ImprintScreen/>;
     }

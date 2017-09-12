@@ -17,11 +17,12 @@ import { news } from './tabs/news/redux';
 import { schedule } from './tabs/schedule/redux';
 import { canteen } from './tabs/canteen/redux';
 import { settings } from './tabs/service/redux';
+import { rooms } from './tabs/rooms/redux';
 
 // SETUP STORE with middleware
 
 export default function setupStore(onComplete: ?() => void) {
-  const reducers = combineReducers({ news, schedule, canteen, settings });
+  const reducers = combineReducers({ news, schedule, canteen, settings, rooms });
   // enhance store: autohydrate (offline data), thunk middleware (functions actions)
   const storeEnhancers = compose(autoRehydrate(), applyMiddleware(thunk));
   const store = createStore(reducers, {}, storeEnhancers);
