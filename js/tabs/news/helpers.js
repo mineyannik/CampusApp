@@ -58,15 +58,17 @@ export default function fetchNewsData(newsXMLData) {
 export function fetchNewsDataFromFb(fbJsonNewsData) {
   let newsList = [];
   fbJsonNewsData.data.map((newsElem, index) => {
-    newsList.push({
-      id: index,
-      url: newsElem.permalink_url,
-      heading: newsElem.caption || newsElem.name,
-      subheading: newsElem.story || '',
-      time: _parseFbDate(newsElem.created_time),
-      imgUrl: newsElem.full_picture,
-      body: newsElem.description || newsElem.message
-    });
+    if(newsElem.description || newsElem.message || newsElem.caption || newsElem.story) {
+      newsList.push({
+        id: index,
+        url: newsElem.permalink_url,
+        heading: _formatHeading(newsElem.caption) || _formatHeading(newsElem.name) || 'StuV DHBW News',
+        subheading: newsElem.story || '',
+        time: _parseFbDate(newsElem.created_time),
+        imgUrl: newsElem.full_picture,
+        body: newsElem.description || newsElem.message
+      });
+    }
   });
   return newsList;
 }
@@ -74,4 +76,13 @@ export function fetchNewsDataFromFb(fbJsonNewsData) {
 function _parseFbDate(fbDate) {
   let dateString = fbDate.slice(0, fbDate.length - 2) + ':' + fbDate.slice(fbDate.length - 2) ;
   return new Date(dateString);
+}
+
+function _formatHeading(heading) {
+  if(!heading) {
+    return null;
+  }
+  const regex = /(@\[.*?:\d*:|])/g; // replaces facebook's annotations
+  heading = heading.replace(regex, '');
+  return heading;
 }
