@@ -7,12 +7,19 @@ import {
   StyleSheet,
   View,
   WebView,
+  BackHandler
 } from 'react-native';
 
 import CampusHeader from '../../util/CampusHeader';
 import Colors from '../../util/Colors';
 
 export default class NewsDetails extends Component {
+  componentWillMount() {
+    if(Platform.OS === 'android'){
+      BackHandler.addEventListener('hardwareBackPress', this.props.backAction);
+    }
+  }
+  
   render() {
     const fontSize = Platform.OS === 'ios' ? 'font-size: 42px;' : '' ;
     const HTML = `
