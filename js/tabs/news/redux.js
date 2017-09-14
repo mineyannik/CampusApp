@@ -44,9 +44,7 @@ export function fetchNews() { // a function as actions (enabled by thunk)
     try {
       let response, responseBody;
       let newsItems = {};
-      const { subscribedFeeds } = getState().news;
       await Promise.all(feeds.map(async (feed) => {
-        if(subscribedFeeds[feed.subId]) {
           if(feed.type == 999) { // 999 = Facebook News Feed
             response = await fetch('https://graph.facebook.com/' + feed.key + '/posts?fields=message,full_picture,caption,description,name,story,created_time,permalink_url&limit=10&access_token=' + fbAccessToken);
             responseBody = await response.json();
@@ -55,8 +53,7 @@ export function fetchNews() { // a function as actions (enabled by thunk)
             response = await fetch('https://www.dhbw-loerrach.de/index.php?id=' + feed.id + '&type=' + feed.type);
             responseBody = await response.text();
             newsItems[feed.key] = fetchNewsData(responseBody);
-          } 
-        }
+          }
       }));
       dispatch(receiveNews(newsItems));
     } catch(e) {

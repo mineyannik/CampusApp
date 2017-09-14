@@ -9,7 +9,8 @@ import {
   ScrollView,
   StyleSheet,
   View,
-  Button
+  Button,
+  Text
 } from 'react-native';
 
 import { connect } from 'react-redux';
@@ -104,10 +105,14 @@ class NewsScreen extends Component {
   }
 
   _getPages(news) {
+    // Uncomment this to hide feeds to which the user has not subscribed
+    /*
     const filteredFeeds = feeds.filter((elem) => {
       return this.props.subscriptions[elem.subId]
     });
-    
+    */
+    const filteredFeeds = feeds;
+
     let pages = filteredFeeds.map(
             (feed) => {
                 return {
@@ -141,6 +146,7 @@ class NewsScreen extends Component {
     
     return(
       <View style={styles.feedSettingsContainer}>
+        <Text style={styles.explanationText}>Hier kannst du einstellen, für welche Feeds du Push-Benachrichtigungen erhalten möchtest.</Text>
         {feedSettings}
         {btnSave}
       </View>
@@ -152,7 +158,7 @@ class NewsScreen extends Component {
       return (
         news.map(
           (newsItem, index) =>
-            <NewsCell key={'t' + index} news={newsItem}
+            <NewsCell key={'t' + index} news={newsItem} topic={topic}
               onPress={() => this.onNewsItemPressed(newsItem, topic)}/>
         )
       );
@@ -222,6 +228,9 @@ const styles = StyleSheet.create({
     },
     btnSave: {
       marginTop: 15
+    },
+    explanationText: {
+      paddingVertical: 15
     }
 });
 
