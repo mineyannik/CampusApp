@@ -152,7 +152,7 @@ class NewsScreen extends Component {
       return (
         news.map(
           (newsItem, index) =>
-            <NewsCell key={'t' + index} news={newsItem}
+            <NewsCell key={'t' + index} news={newsItem} topic={topic}
               onPress={() => this.onNewsItemPressed(newsItem, topic)}/>
         )
       );
