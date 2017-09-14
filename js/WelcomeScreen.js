@@ -22,6 +22,7 @@ import Colors from './util/Colors';
 import { selectRole } from './tabs/service/redux';
 import { textDisclaimer } from './tabs/service/Texts';
 import RoleSelection from './tabs/service/RoleSelection';
+import { subscriptionsChanged } from './tabs/news/redux';
 
 const ButtonTouchable = Platform.OS === 'android'
   ? TouchableNativeFeedback
@@ -30,11 +31,14 @@ const ButtonTouchable = Platform.OS === 'android'
 class WelcomeScreen extends Component {
   constructor(props){
     super(props);
-    this.state = { disclaimerChecked: false, };
+    this.state = { disclaimerChecked: false, enablePushNotif: true};
   }
 
   _onSubmit() {
-    if(this.state.disclaimerChecked && this.state.selectedRole){
+    if(this.state.disclaimerChecked && this.state.selectedRole) {
+      if(!this.state.enablePushNotif) { 
+        this.props.dispatch(subscriptionsChanged([false,false,false,false]))
+      }
       this.props.dispatch(selectRole(this.state.selectedRole));
     }
   }
@@ -72,6 +76,10 @@ class WelcomeScreen extends Component {
                 {'Start >'}
               </Text>
             </ButtonTouchable>
+          </View>
+          <View style={styles.pushInfo}>
+            <Text style={{flex: 1}}>Ich möchte Push-Benachrichtigungen zu Neuigkeiten erhalten:</Text>
+            <Switch style={{flex: 1}}onValueChange={(value) => this.setState({enablePushNotif: value})} value={this.state.enablePushNotif} />
           </View>
         </ScrollView>
       </View>
@@ -136,6 +144,10 @@ const styles = StyleSheet.create({
   submit: {
     fontSize: 24,
   },
+  pushInfo: {
+    flexDirection: 'row',
+    marginTop: 10
+  }
 });
 
 export default connect()(WelcomeScreen);
