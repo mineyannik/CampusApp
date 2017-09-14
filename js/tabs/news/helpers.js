@@ -84,5 +84,13 @@ function _formatHeading(heading) {
   }
   const regex = /(@\[.*?:\d*:|])/g; // replaces facebook's annotations
   heading = heading.replace(regex, '');
+  
+  // Trim heading and add ... when the title is too long
+  const maxLength = 75;
+  if(heading.length > 75) {
+    heading = heading.substring(0, 75);
+    heading = heading + '...';
+  }
+
   return heading;
 }
