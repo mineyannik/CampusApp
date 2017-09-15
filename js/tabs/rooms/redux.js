@@ -130,7 +130,8 @@ export function rooms(state = {
         };
     case UNSELECT_ROOM:
         return {...state,
-            selectedRoom: null
+            selectedRoom: null,
+            searchResults: null
         };
     case REHYDRATE:
         const incoming = action.payload.rooms;
