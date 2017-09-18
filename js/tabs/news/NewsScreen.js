@@ -155,6 +155,11 @@ class NewsScreen extends Component {
 
   _renderNewsItems(news, topic) {
     if(news) {
+      if(topic === 'events') {
+        news = news.sort(function (a, b) {
+          return new Date(a.time) - new Date(b.time);
+        })
+      }
       return (
         news.map(
           (newsItem, index) =>
