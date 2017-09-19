@@ -173,6 +173,16 @@ class NewsScreen extends Component {
     
   }
 
+  _checkIfPrevNewsExist(news) {
+    let result = !(Object.keys(news).length === 0); // check if news object is not empty
+    Object.keys(news).map(feed => {
+      if(!feed.length) { // check if one feed inside the news object is empty
+        result = false;
+      }
+    });
+    return result;
+  }
+
   _renderScreenContent() {
     const { news, isFetching, networkError } = this.props;
 
@@ -185,7 +195,7 @@ class NewsScreen extends Component {
     }
 
     const buttonText = 'News laden';
-    if(networkError && !news.length) {
+    if(networkError && !this._checkIfPrevNewsExist(news)) {
       return (
         <ReloadView buttonText={buttonText}
           onPress={() => this.props.dispatch(fetchNews())}/>

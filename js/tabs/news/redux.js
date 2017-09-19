@@ -33,8 +33,7 @@ const ERROR_FETCHING_NEWS = 'ERROR_FETCHING_NEWS';
 
 export function errorFetchingNews() {
   return {
-    type: ERROR_FETCHING_NEWS,
-    news: []
+    type: ERROR_FETCHING_NEWS
   }
 }
 
@@ -90,7 +89,7 @@ export function news(state = {
   networkError: false,
   lastUpdated: null,
   subscribedFeeds: [true,true,true,true],
-  news: []
+  news: {}
 }, action) {
   switch (action.type) {
     case REQUEST_NEWS:
