@@ -1,27 +1,28 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Button,
   SectionList,
   StyleSheet,
-  View
+  View,
 } from 'react-native';
 import {
   useFocusEffect,
   useNavigation,
-  useNavigationEvents
+  useNavigationEvents,
 } from 'react-navigation-hooks';
 
 import Colors from '../../util/Colors';
 import DayHeader from '../../util/DayHeader';
 import HeaderIcon from '../../util/HeaderIcon';
 import ReloadView from '../../util/ReloadView';
+import SearchBar from '../../util/SearchBar';
 
 import LectureRow from './LectureRow';
 import {
   loadScheduleDataFromStore,
   fetchLecturesFromWeb,
-  saveLecturesToStore
+  saveLecturesToStore,
 } from './store';
 
 function ScheduleScreen() {
@@ -29,6 +30,7 @@ function ScheduleScreen() {
   const [hasNetworkError, setNetworkError] = useState(false);
   const [course, setCourse] = useState(null);
   const [lectures, setLectures] = useState(null);
+  const [searchString, setSearchString] = useState('');
 
   const { navigate, setParams } = useNavigation();
 
@@ -51,14 +53,34 @@ function ScheduleScreen() {
     setLoading(false);
   }
 
+  function filterLectures(searchString, rawLectures) {
+    if (searchString.length === 0) {
+      return rawLectures;
+    }
+    //Do not touch downloaded lectures
+    const lectures = [...rawLectures];
+    searchString = searchString.toLowerCase();
+    for (let i = 0; i < lectures.length; i++) {
+      //Do not touch original data
+      let lecture = Object.assign({}, lectures[i]);
+      lecture.data = lecture.data.filter((date) =>
+        date.title.toLowerCase().includes(searchString)
+      );
+      lectures[i] = lecture;
+    }
+    return lectures.filter((lecture) => lecture.data.length !== 0);
+  }
+
   // when screen is focussed, load data
   useFocusEffect(
     useCallback(() => {
+      //The user expects an empty search bar on re-navigation
+      setSearchString('');
       loadData();
     }, [])
   );
 
-  useNavigationEvents(event => {
+  useNavigationEvents((event) => {
     // after focus, update navigation params to set header title to course (see bottom of file)
     async function loadCourseAndSetParam() {
       let { course } = await loadScheduleDataFromStore();
@@ -116,8 +138,12 @@ function ScheduleScreen() {
   // contenInset: needed for last item to be displayed above tab bar on iOS
   return (
     <View style={styles.container}>
+      <SearchBar
+        onSearch={(text) => setSearchString(text)}
+        searchString={searchString}
+      />
       <SectionList
-        sections={lectures}
+        sections={filterLectures(searchString, lectures)}
         onRefresh={loadData}
         refreshing={isLoading}
         renderItem={({ item }) => <LectureRow lecture={item} />}
@@ -132,25 +158,25 @@ function ScheduleScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   center: {
     flex: 2,
     alignItems: 'center',
-    justifyContent: 'center'
-  }
+    justifyContent: 'center',
+  },
 });
 
 ScheduleScreen.navigationOptions = ({ navigation }) => {
   let headerTitle = navigation.getParam('course', 'Vorlesungsplan');
   return {
-    headerRight: (
+    headerRight: () => (
       <HeaderIcon
         onPress={() => navigation.navigate('EditCourse')}
         icon="edit"
       />
     ),
-    headerTitle
+    headerTitle,
   };
 };
 
